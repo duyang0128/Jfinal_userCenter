@@ -25,5 +25,7 @@
 <script type="text/javascript">
     if ('ontouchstart' in document.documentElement) document.write("<script src='assets/js/jquery.mobile.custom.min.js'>" + "<" + "/script>");
 </script>
+
+<script src="${staticServePath}/static/js/dev.js"></script>
     <#nested>
 </#macro>

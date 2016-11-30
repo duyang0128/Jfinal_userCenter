@@ -17,6 +17,7 @@ package com.hudongwx.userCenter.controller;
 
 import com.hudongwx.userCenter.util.CaptchaUtil;
 import com.jfinal.core.Controller;
+import com.jfinal.render.CaptchaRender;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -30,8 +31,10 @@ public class VerifyCodeController extends Controller {
      * 验证码
      */
     public void index() throws IOException {
-        HttpServletResponse response = getResponse();
-        String verifyCode = CaptchaUtil.outputImage(response.getOutputStream());
-        renderNull();
+//        HttpServletResponse response = getResponse();
+//        String verifyCode = CaptchaUtil.outputImage(response.getOutputStream());
+//        getRequest().getSession(true).setAttribute("verifyCode", verifyCode);
+//        renderNull();
+        renderCaptcha();
     }
 }

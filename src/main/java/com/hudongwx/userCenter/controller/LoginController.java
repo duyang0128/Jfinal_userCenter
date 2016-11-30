@@ -25,7 +25,9 @@ import com.hudongwx.userCenter.sso.Res;
 import com.jfinal.aop.Before;
 import com.jfinal.core.Controller;
 import com.jfinal.ext.interceptor.POST;
+import com.jfinal.render.CaptchaRender;
 
+import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
@@ -49,9 +51,15 @@ public class LoginController extends BaseController {
          * 登录 生产环境需要过滤sql注入
          */
         String url = getPara("url");
+
         WafRequestWrapper req = new WafRequestWrapper(getRequest());
         String username = req.getParameter("username");
         String password = req.getParameter("password");
+        String vcode = getPara("vcode");
+        if(!CaptchaRender.validate(this,vcode)){
+            renderJson("{\"isLogin\":"+CaptchaRender.validate(this,vcode)+"}");
+            return ;
+        }
         if ("kisso".equals(username) && "123".equals(password)) {
             /**
              * 系统定义 SSOToken st = new SSOToken();
@@ -67,7 +75,9 @@ public class LoginController extends BaseController {
             //记住密码，设置 cookie 时长 1 周 = 604800 秒 【动态设置 maxAge 实现记住密码功能】
             String rememberMe = req.getParameter("rememberMe");
             if ("on".equals(rememberMe)) {
-                setAttr(SSOConfig.SSO_COOKIE_MAXAGE, 604800);
+                HttpSession session = getSession();
+                log.info(session.toString());
+                setAttr(SSOConfig.SSO_COOKIE_MAXAGE, 0);
             }
 
             SSOHelper.setSSOCookie(getRequest(), getResponse(), mt, true);

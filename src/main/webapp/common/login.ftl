@@ -6,6 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta charset="utf-8"/>
 <@head title="登录">
+    <link rel="stylesheet" type="text/css"
+          href="${staticServePath}/static/css/lib/ladda-themeless.min.css?${staticResourceVersion}">
+
     <meta name="description" content="User login page"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
     <!-- bootstrap & fontawesome -->
@@ -65,7 +68,7 @@
 
                                     <div class="space-6"></div>
 
-                                    <form method="post" action="${staticServePath}/login/login">
+                                    <form id="login-panel" method="post" action="${staticServePath}/login/login">
                                         <fieldset>
                                             <label class="block clearfix">
 														<span class="block input-icon input-icon-right">
@@ -103,15 +106,18 @@
 
                                             <div class="clearfix">
                                                 <label class="inline">
-                                                    <input type="checkbox" class="ace"/>
+                                                    <input type="checkbox" class="ace" name="rememberMe"/>
                                                     <span class="lbl"> 记住密码</span>
                                                 </label>
-
-                                                <button type="submit"
-                                                        class="width-35 pull-right btn btn-sm btn-primary">
-                                                    <i class="ace-icon fa fa-key"></i>
-                                                    <span class="bigger-110">登录</span>
+                                                <button type="submit" data-style="slide-up" id="save-btn"
+                                                        class="width-35 pull-right btn-sm btn btn-primary ladda-button">
+                                                    <span class="bigger-110 ladda-label"><i class="ace-icon fa fa-key"></i>&nbsp;登录</span>
                                                 </button>
+                                            <#--<button type="submit"-->
+                                            <#--class="width-35 pull-right btn btn-sm btn-primary">-->
+                                            <#--<i class="ace-icon fa fa-key"></i>-->
+                                            <#--<span class="bigger-110">登录</span>-->
+                                            <#--</button>-->
                                             </div>
 
                                             <div class="space-4"></div>
@@ -300,9 +306,18 @@
 </div><!-- /.main-container -->
 
 
-<@foot></@foot>
+<@foot>
+
+<script src="${staticServePath}/assets/js/jquery.form.min.js"></script>
+<script src="${staticServePath}/static/js/common.js"></script>
+
+<script src="${staticServePath}/static/js/lib/spin.min.js?${staticResourceVersion}"></script>
+<script src="${staticServePath}/static/js/lib/ladda.min.js?${staticResourceVersion}" type="text/javascript"></script>
+
+</@foot>
 <!-- inline scripts related to this page -->
 <script type="text/javascript">
+
     jQuery(function ($) {
         $(document).on('click', '.toolbar a[data-target]', function (e) {
             e.preventDefault();
@@ -310,8 +325,25 @@
             $('.widget-box.visible').removeClass('visible');//hide others
             $(target).addClass('visible');//show target
         });
+        var btn = Ladda.create(document.querySelector("#save-btn"));
+
+        $('#login-panel').ajaxForm({
+            beforeSend: function () {
+                btn.start();
+                return true;
+            },
+            success: function (responseText, statusText) {
+                //btn.stop();
+                console.log(responseText);
+            }
+        });
     });
 
+    var Login = {
+        do: function () {
+
+        }
+    }
 
     //you don't need this, just used for changing background
     jQuery(function ($) {
