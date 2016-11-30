@@ -227,7 +227,14 @@ ul.nav li:hover {
 }
 
 .item {
-    box-shadow: 0px 5px 5px #a5a5a5;
+    box-shadow: 0 5px 5px #a5a5a5;
+    width:30%;
+    height:60%;
+    margin:0 auto;
+    padding:25px 12px;
+    min-height:320px;
+    clear:both;  position:relative;
+    background: white;
 }
 
 .title {

@@ -2,10 +2,13 @@ package com.hudongwx.userCenter.common;
 
 import com.hudongwx.userCenter.controller.LoginController;
 import com.hudongwx.userCenter.controller.LogoutController;
+import com.hudongwx.userCenter.controller.RegistController;
 import com.hudongwx.userCenter.controller.VerifyCodeController;
 import com.hudongwx.userCenter.sso.plugin.KissoJfinalPlugin;
+import com.hudongwx.userCenter.util.Common;
 import com.jfinal.config.*;
 import com.jfinal.core.JFinal;
+import com.jfinal.ext.handler.ContextPathHandler;
 import com.jfinal.kit.PropKit;
 import com.jfinal.render.ViewType;
 
@@ -34,6 +37,7 @@ public class MainConfig extends JFinalConfig {
         me.add("login", LoginController.class,"/common");
         me.add("logout", LogoutController.class);
         me.add("verify", VerifyCodeController.class);
+        me.add("register", RegistController.class);
     }
 
     /**
@@ -63,7 +67,7 @@ public class MainConfig extends JFinalConfig {
      */
     @Override
     public void configHandler(Handlers me) {
-
+        me.add(new ContextPathHandler(Common.LABEL_STATIC_SERVE_PATH));
     }
 
     public static void main(String[] args) {

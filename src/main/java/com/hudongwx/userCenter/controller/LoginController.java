@@ -32,18 +32,15 @@ import java.net.URLDecoder;
 /**
  * 登录
  */
-public class LoginController extends Controller {
+public class LoginController extends BaseController {
 
-    public void index() {
+    public void index() throws UnsupportedEncodingException {
+        fillHeaderAndFooter();
         String returnURL = null;
-        try {
-            returnURL = URLDecoder.decode(getPara("ReturnURL"), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        returnURL = URLDecoder.decode(getPara("ReturnURL"), "UTF-8");
         System.out.println(returnURL);
         setAttr("url", returnURL);
-        render("login.ftl");
+        render("demo.ftl");
     }
 
     @Before(POST.class)
@@ -69,8 +66,8 @@ public class LoginController extends Controller {
 
             //记住密码，设置 cookie 时长 1 周 = 604800 秒 【动态设置 maxAge 实现记住密码功能】
             String rememberMe = req.getParameter("rememberMe");
-            if ( "on".equals(rememberMe) ) {
-            	setAttr(SSOConfig.SSO_COOKIE_MAXAGE, 604800);
+            if ("on".equals(rememberMe)) {
+                setAttr(SSOConfig.SSO_COOKIE_MAXAGE, 604800);
             }
 
             SSOHelper.setSSOCookie(getRequest(), getResponse(), mt, true);
