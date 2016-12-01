@@ -56,7 +56,6 @@
                     </div>
 
                     <div class="space-6"></div>
-
                     <div class="position-relative">
                         <div id="login-box" class="login-box visible widget-box no-border">
                             <div class="widget-body">
@@ -65,7 +64,6 @@
                                         <i class="ace-icon fa fa-coffee green"></i>
                                         请输入您的信息
                                     </h4>
-
                                     <div class="space-6"></div>
 
                                     <form id="login-panel" method="post" action="${staticServePath}/login/login">
@@ -75,6 +73,7 @@
 															<input type="text" class="form-control"
                                                                    name="username" placeholder="电子邮箱/手机号"/>
 															<i class="ace-icon fa fa-user"></i>
+                                                            <span class="help-block"></span>
 														</span>
                                             </label>
 
@@ -98,7 +97,7 @@
                                                 </div>
                                                 <div class="pull-right">
                                                     <img onclick="this.src=('/verify?reload='+(new Date()).getTime())"
-                                                         class="vcode" src="${staticServePath}/verify"
+                                                         class="vcode" src="${staticServePath}/verify" id="login-vcode"
                                                          width="85" height="35" alt="">
                                                 </div>
                                             </div>
@@ -111,7 +110,8 @@
                                                 </label>
                                                 <button type="submit" data-style="slide-up" id="save-btn"
                                                         class="width-35 pull-right btn-sm btn btn-primary ladda-button">
-                                                    <span class="bigger-110 ladda-label"><i class="ace-icon fa fa-key"></i>&nbsp;登录</span>
+                                                    <span class="bigger-110 ladda-label"><i
+                                                            class="ace-icon fa fa-key"></i>&nbsp;登录</span>
                                                 </button>
                                             <#--<button type="submit"-->
                                             <#--class="width-35 pull-right btn btn-sm btn-primary">-->
@@ -313,11 +313,13 @@
 
 <script src="${staticServePath}/static/js/lib/spin.min.js?${staticResourceVersion}"></script>
 <script src="${staticServePath}/static/js/lib/ladda.min.js?${staticResourceVersion}" type="text/javascript"></script>
-
+<script src="${staticServePath}/static/js/lib/bootstrap.min.js"></script>
 </@foot>
 <!-- inline scripts related to this page -->
 <script type="text/javascript">
-
+    $(function () {
+        $("[data-toggle='tooltip']").tooltip();
+    });
     jQuery(function ($) {
         $(document).on('click', '.toolbar a[data-target]', function (e) {
             e.preventDefault();
@@ -326,25 +328,29 @@
             $(target).addClass('visible');//show target
         });
         var btn = Ladda.create(document.querySelector("#save-btn"));
-
+        $('#tp').tooltip();
         $('#login-panel').ajaxForm({
+            dataType: 'json',
             beforeSend: function () {
                 btn.start();
                 return true;
             },
-            success: function (responseText, statusText) {
-                //btn.stop();
-                console.log(responseText);
+            success: function (resp, statusText) {
+
+                if (resp.msg.isLogin == true) {
+                    Dev().log(resp);
+                    window.location.href = '${url}';
+                }
+            },
+            error: function (resp) {
+                FormException.bindForm('#login-panel').do(resp.responseJSON.msg.expList);
+            },
+            complete: function () {
+                btn.stop();
+                $('#login-vcode').click();
             }
         });
     });
-
-    var Login = {
-        do: function () {
-
-        }
-    }
-
     //you don't need this, just used for changing background
     jQuery(function ($) {
         $('#btn-login-dark').on('click', function (e) {

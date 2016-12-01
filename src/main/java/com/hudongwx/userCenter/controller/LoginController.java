@@ -21,15 +21,20 @@ import com.baomidou.kisso.SSOToken;
 import com.baomidou.kisso.common.IpHelper;
 import com.baomidou.kisso.common.util.HttpUtil;
 import com.baomidou.kisso.web.waf.request.WafRequestWrapper;
+import com.hudongwx.userCenter.mock.Exp;
+import com.hudongwx.userCenter.mock.LoginStatus;
 import com.hudongwx.userCenter.sso.Res;
+import com.hudongwx.userCenter.util.Common;
+import com.hudongwx.userCenter.util.MockKit;
+import com.hudongwx.userCenter.util.RenderKit;
 import com.jfinal.aop.Before;
-import com.jfinal.core.Controller;
 import com.jfinal.ext.interceptor.POST;
 import com.jfinal.render.CaptchaRender;
 
 import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 
 /**
  * 登录
@@ -57,7 +62,11 @@ public class LoginController extends BaseController {
         String password = req.getParameter("password");
         String vcode = getPara("vcode");
         if(!CaptchaRender.validate(this,vcode)){
-            renderJson("{\"isLogin\":"+CaptchaRender.validate(this,vcode)+"}");
+            RenderKit.render403Error(this,new LoginStatus(CaptchaRender.validate(this,vcode),
+                        MockKit.<Exp>start()
+                                .add(new Exp("vcode",Exp.STATE_ERROR,"验证码错误"))
+                                .build()
+                    ));
             return ;
         }
         if ("kisso".equals(username) && "123".equals(password)) {
@@ -77,14 +86,20 @@ public class LoginController extends BaseController {
             if ("on".equals(rememberMe)) {
                 HttpSession session = getSession();
                 log.info(session.toString());
-                setAttr(SSOConfig.SSO_COOKIE_MAXAGE, 0);
+                setAttr(SSOConfig.SSO_COOKIE_MAXAGE, Common.MAX_AGE);
             }
 
             SSOHelper.setSSOCookie(getRequest(), getResponse(), mt, true);
             if (url == null)
                 renderNull();
             else
-                redirect(url);
+                RenderKit.renderSuccess(this,new LoginStatus(true,new ArrayList<>()));
+        }else{
+            RenderKit.render403Error(this,new LoginStatus(CaptchaRender.validate(this,vcode),
+                    MockKit.<Exp>start()
+                            .add(new Exp("username",Exp.STATE_ERROR,"账号有问题"))
+                            .build()
+            ));
         }
     }
 
@@ -96,8 +111,6 @@ public class LoginController extends BaseController {
      * 调用时需要为请求Header设置PLATFORM=APP
      * 否则请求将不会被kisso处理，而直接视为jFinal的controller
      * </p>
-     *
-     * @author 成都瘦人  lendo.du@gmail.com
      */
     public void auth() {
         Res res = new Res();
@@ -117,7 +130,10 @@ public class LoginController extends BaseController {
                     res.setData("已下发Cookies至响应");
                     renderJson(res);
                 } else {
-                    renderError(401);
+                    RenderKit.renderError(this, MockKit.<Exp>start()
+                            .add(new Exp("vcode",Exp.STATE_ERROR,"验证码错误"))
+                            .add(new Exp("username",Exp.STATE_ERROR,"有点问题哟"))
+                            .build());
                 }
             } else {
                 renderError(401);

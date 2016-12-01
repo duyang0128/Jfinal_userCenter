@@ -3,52 +3,64 @@
  */
 
 var FormException = {
-    forms:{},
-    bufferKey:'defaults',
-    devMode:true,
-    bindForm:function(selector,key){
-
-        if(key != null)
-            FormException.bufferKey = key;
-        key = FormException.bufferKey;
-        if(FormException.forms[key] != null){
-            Dev().error("试图绑定多个表单时,key值不唯一");
-            return FormException;
+    forms: {},
+    bufferKey: 'defaults',
+    devMode: true,
+    bindForm: function (selector, key) {
+        if (key == null)
+            key = this.bufferKey;
+        this.bufferKey = key;
+        if (this.forms[key] != null) {
+            return this;
         }
-        FormException.forms[key] = selector;
-        if($(selector).length == 0){
+        this.forms[this.bufferKey] = selector;
+        if ($(selector).length == 0) {
             Dev().error("没有绑定到表单");
-            return FormException;
+            return this;
         }
-        if(!$(selector).is('form')){
+        if (!$(selector).is('form')) {
             Dev().warn("虽然你绑定的不是表单，但是这并没有什么关系~");
         }
-        return FormException;
+        return this;
     },
-    use:function (key) {
-        if(FormException.forms[key] != null){
-            FormException.bufferKey = key;
-            return FormException;
+    use: function (key) {
+        if (this.forms[key] != null) {
+            this.bufferKey = key;
+            return this;
         }
 
-        if($(key).length == 0){
+        if ($(key).length == 0) {
             Dev().error("没有绑定到表单");
             return null;
         }
 
-        if(!$(key).is('form')){
+        if (!$(key).is('form')) {
             Dev().warn("虽然你使用的不是表单，但是这并没有什么关系~");
-            FormException.bindForm($(key));
-            return FormException;
+            this.bindForm($(key));
+            return this;
         }
     },
-    do:function (data) {
-        var form = $(FormException.forms[FormException.bufferKey]);
-        if(form.length == 0){
+    do: function (data) {
+        var form = $(this.forms[this.bufferKey]);
+        if (form.length == 0) {
             Dev().error('未查询到表单绑定');
-            return ;
+            return;
         }
-        form.find('[name='+data.name+"]").parent().addClass('has-'+data.state);
+        data.map(function (val, index) {
+            var input = form.find('[name=' + val.name + "]");
+            var p = input.parent();
+            p.addClass('has-' + val.state);
+            var msg = p.find('.help-block');
+            msg.remove();
+            var span = '<span class="help-block"></span>';
+            p.append(span);
+            msg = p.find('.help-block');
+            msg.text(val.msg);
+            input.one('input propertychange', function () {
+                msg.remove();
+                p.removeClass('has-' + val.state);
+            });
+        })
     }
 
 }

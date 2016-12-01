@@ -4,10 +4,12 @@
 
 $(function(){
 
-    FormException.bindForm('#login-panel').do({
-        'name':'username',
-        'state':'success'
-    });
+    // FormException.bindForm('#login-panel').do([
+    //     {
+    //         'name':'username',
+    //         'state':'success'
+    //     }
+    // ]);
 
 
 

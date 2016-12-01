@@ -51,6 +51,7 @@ public class Common {
     public static final String CACHE_60TIME_LABEL = "60time";
     public static final String LABEL_ROOT_MAPPING = "root";
     public static final String SQL_WHERE = " where ";
+    public static final Integer MAX_AGE = 604800;
 
 
     //此处得到主配置
